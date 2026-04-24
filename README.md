@@ -9,7 +9,7 @@ It identifies relationships between habits and symptoms using temporal reasoning
 * `preprocessor.py`: Sorts conversations and extracts relevant tags as events.
 * `timeline_builder.py`: Converts conversations into a sequence of events.
 * `pattern_engine.py`: Analyzes the sequence using an LLM (OpenRouter `gpt-4o-mini`) and outputs structured reasoning.
-* `ui.py`: Streamlit-based web interface to upload datasets and view insights.
+* `ui.py`: A premium **Chat-Streaming Companion** interface (Clary) that allows for conversational analysis, individual user data insertion (via file upload or manual paste), and streamed reasoning results.
 * `main.py`: Entry point for CLI processing or launching the UI.
 
 ## Requirements

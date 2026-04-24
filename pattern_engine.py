@@ -94,6 +94,65 @@ Timeline:
     except Exception as e:
         return {"user_id": user_id, "patterns": [{"pattern": "Unexpected Error", "confidence": "low", "reason": str(e)}]}
 
+def identify_intent(prompt: str) -> str:
+    """
+    Use LLM to identify if the user wants an analysis or just a general chat.
+    Returns: 'ANALYZE' or 'CHAT'
+    """
+    p = prompt.lower().strip()
+    # Lenient keyword matching to handle typos like 'amalyze'
+    if any(word in p for word in ["analy", "pattern", "caus", "effect", "history"]):
+        return "ANALYZE"
+        
+    api_key = get_api_key()
+    try:
+        response = requests.post(
+            OPENROUTER_URL,
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": "openai/gpt-4o-mini",
+                "messages": [
+                    {"role": "system", "content": "You are a classifier. If the user mentions analysis, patterns, health, causes, or anything related to processing their history, output 'ANALYZE'. Otherwise output 'CHAT'. Even if they are vague or have typos (like 'amalyze'), if they want to start the process, output 'ANALYZE'."},
+                    {"role": "user", "content": prompt}
+                ]
+            },
+            timeout=10
+        )
+        intent = response.json()["choices"][0]["message"]["content"].strip().upper()
+        return "ANALYZE" if "ANALYZE" in intent else "CHAT"
+    except Exception:
+        return "CHAT"
+
+def general_chat(messages: list) -> str:
+    """
+    Handle general conversational messages contextually.
+    """
+    api_key = get_api_key()
+    try:
+        response = requests.post(
+            OPENROUTER_URL,
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": "openai/gpt-4o-mini",
+                "messages": [
+                    {"role": "system", "content": "You are Clary, a Health Pattern AI companion. You help users understand causal links in their health history. Be concise, empathetic, and professional. If the user says 'ok' or similar acknowledgments, respond naturally based on the conversation history."}
+                ] + messages[-5:] # send last 5 messages for context
+            },
+            timeout=30
+        )
+        if response.status_code == 200:
+            return response.json()["choices"][0]["message"]["content"]
+        else:
+            return "I'm having trouble connecting right now. How can I help you with your health analysis?"
+    except Exception:
+        return "I'm here to help with your health pattern analysis. What would you like to know?"
+
 def analyze_all_users(users: list, timeline_builder_func) -> dict:
     all_results = []
     for user in users:

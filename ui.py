@@ -1,74 +1,127 @@
 import streamlit as st
 import json
 import os
-import traceback
+import time
 from data_loader import load_dataset, get_users
 from timeline_builder import build_timeline
-from pattern_engine import analyze_all_users
+from pattern_engine import detect_patterns
 
-st.set_page_config(page_title="Temporal Health Pattern Detection", layout="wide")
+# 1. Page Configuration & Setup
+st.set_page_config(page_title="Clary - Health Pattern AI", page_icon="🤖", layout="centered")
 
-st.title("Temporal Health Pattern Detection")
-st.write("Analyze conversational health data to detect hidden cause-effect patterns.")
+# Custom Dark Mode Styling
+st.markdown("""
+    <style>
+    .stApp { background-color: #0E1117; color: #FFFFFF; }
+    .stChatMessage { background-color: #1E2127; border-radius: 10px; margin-bottom: 10px; }
+    .stChatInputContainer { padding-bottom: 20px; }
+    hr { margin: 1rem 0; border: 0; border-top: 1px solid #444; }
+    </style>
+""", unsafe_allow_html=True)
 
-uploaded_file = st.file_uploader("Upload dataset (JSON)", type=["json"])
-default_file_path = "askfirst_synthetic_dataset.json"
-download_path = r"c:\Users\darap\Downloads\askfirst_synthetic_dataset.json"
-
-dataset = None
-if uploaded_file is not None:
-    dataset = json.load(uploaded_file)
-elif os.path.exists(default_file_path):
-    st.info(f"Using default dataset: {default_file_path}")
-    with open(default_file_path, 'r', encoding='utf-8') as f:
-        dataset = json.load(f)
-elif os.path.exists(download_path):
-    st.info("Using default dataset from Downloads.")
-    with open(download_path, 'r', encoding='utf-8') as f:
-        dataset = json.load(f)
-else:
-    st.warning("Please upload a dataset or place 'askfirst_synthetic_dataset.json' in the working directory.")
-
-if dataset and st.button("Analyze"):
-    with st.spinner("Analyzing users... This may take a moment."):
+# 2. Sidebar - User Selection
+with st.sidebar:
+    st.title("⚙️ Control Panel")
+    
+    # Requirement: User must be able to upload data
+    uploaded_file = st.file_uploader("📂 Upload Health Dataset (JSON)", type=["json"])
+    
+    # Fallback/Default path
+    default_path = "askfirst_synthetic_dataset.json"
+    dataset = None
+    
+    if uploaded_file is not None:
+        dataset = json.load(uploaded_file)
+        st.success("Custom dataset uploaded!")
+    elif os.path.exists(default_path):
+        with open(default_path, 'r', encoding='utf-8') as f:
+            dataset = json.load(f)
+        st.info("Using default dataset.")
+            
+    if dataset:
         users = get_users(dataset)
-        try:
-            results = analyze_all_users(users, build_timeline)
-            st.success("Analysis Complete!")
+        user_ids = [u.get("user_id") for u in users]
+        selected_user_id = st.selectbox("👤 Select User to Analyze", user_ids)
+    else:
+        st.error("Please upload a dataset to begin.")
+        selected_user_id = None
+
+    st.divider()
+    if st.button("🗑️ Reset Conversation"):
+        st.session_state.messages = []
+        st.rerun()
+
+# 3. Initialize Chat History
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# 4. Display Existing Messages
+for message in st.session_state.messages:
+    avatar = "👤" if message["role"] == "user" else "🤖"
+    with st.chat_message(message["role"], avatar=avatar):
+        st.markdown(message["content"])
+
+# 5. Chat Interaction Helper
+def stream_response(text):
+    for word in text.split(" "):
+        yield word + " "
+        time.sleep(0.01)
+
+if prompt := st.chat_input("Ask me to analyze your health patterns"):
+    # Add user message
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user", avatar="👤"):
+        st.markdown(prompt)
+
+    # AI Process & Response
+    with st.chat_message("assistant", avatar="🤖"):
+        # Process intent in background (no visible status box)
+        from pattern_engine import identify_intent, general_chat, detect_patterns
+        intent = identify_intent(prompt)
+        
+        # If intent is CHAT, use general chat
+        if intent == "CHAT":
+            with st.spinner("💭 ..."):
+                chat_context = st.session_state.messages
+                response = general_chat(chat_context)
             
-            # Display results
-            results_list = results.get("results", [])
-            if not results_list:
-                st.warning("No patterns detected.")
+            full_response = st.write_stream(stream_response(response))
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
             
-            for user_result in results_list:
-                st.subheader(f"User: {user_result.get('user_id')}")
-                
-                patterns = user_result.get("patterns", [])
-                if not patterns:
-                    st.write("No specific patterns identified for this user.")
-                
-                for pattern in patterns:
-                    confidence = str(pattern.get("confidence", "low")).lower()
-                    color = "green" if confidence == "high" else "orange" if confidence == "medium" else "red"
-                    
-                    st.markdown(f"**Pattern:** {pattern.get('pattern')}")
-                    st.markdown(f"**Confidence:** :{color}[{confidence.capitalize()}]")
-                    st.markdown(f"**Reasoning:** {pattern.get('reason')}")
-                    st.divider()
-                    
-            st.subheader("Raw Output")
-            st.json(results)
+        elif not selected_user_id:
+            st.error("Please select a user profile in the sidebar first.")
+        else:
+            # A. Find user data
+            user_data = next(u for u in users if u["user_id"] == selected_user_id)
             
-            # Add download button
-            json_string = json.dumps(results, indent=2)
-            st.download_button(
-                label="Download Results JSON",
-                file_name="results.json",
-                mime="application/json",
-                data=json_string,
-            )
+            # B. Display Temporal History
+            st.write("### 📅 Temporal History")
+            timeline = build_timeline(user_data)
+            timeline_display = ""
+            for entry in timeline:
+                timeline_display += entry.replace(": ", " → ") + "\n"
+            st.code(timeline_display, language="text")
             
-        except Exception as e:
-            st.error(f"Error during analysis: {e}")
-            st.code(traceback.format_exc())
+            # C. Detect Patterns with a temporary spinner
+            with st.spinner(f"🔍 Analyzing {selected_user_id}'s timeline..."):
+                result = detect_patterns(selected_user_id, timeline)
+                patterns = result.get("patterns", [])
+
+            # D. Format Final Response
+            intro = f"I have analyzed the temporal data for **{selected_user_id}**. Here are the causal patterns I identified:\n\n"
+            if not patterns:
+                full_text = intro + "No significant temporal patterns were detected."
+            else:
+                full_text = intro
+                for p in patterns:
+                    conf = p.get('confidence', 'low').upper()
+                    full_text += f"#### 🔍 Pattern: {p.get('pattern')}\n"
+                    full_text += f"**Confidence:** {conf}\n\n"
+                    full_text += f"**Reasoning:** {p.get('reason')}\n"
+                    full_text += "\n---\n\n"
+
+            # E. Professional Streaming Output
+            full_response = st.write_stream(stream_response(full_text))
+            
+            # Save assistant message
+            st.session_state.messages.append({"role": "assistant", "content": full_response})

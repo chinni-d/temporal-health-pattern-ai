@@ -21,9 +21,8 @@ temporal-health-pattern-ai/
 │   │   ├── data_loader.py
 │   │   └── preprocessor.py
 │   └── utils.py                # Utilities
-├── ui/                         # User Interface
-│   └── app.py                  # Streamlit App
-├── main.py                     # Entry Point
+├── ui.py                       # Streamlit App (Main Entry)
+├── main.py                     # CLI Entry Point
 ├── .env                        # Private config
 └── .gitignore
 ```
@@ -47,11 +46,11 @@ I chose `gpt-4o-mini` (via OpenRouter) because temporal reasoning requires a hig
 
 ### Chunking and Context Management Strategy
 Instead of blindly chunking tokens or using a vector database (which inherently loses chronological continuity), I implemented a **Deterministic Timeline Condensation Strategy**. 
-The `timeline_builder.py` preprocesses the entire conversational history for a user, sorting it strictly by timestamp, and extracts only the explicit metadata tags and symptoms mapped to `Session IDs`. 
+The `src/engine/timeline_builder.py` preprocesses the entire conversational history for a user, sorting it strictly by timestamp, and extracts only the explicit metadata tags and symptoms mapped to `Session IDs`. 
 By doing this, the entire compressed chronological history of a single user easily fits within the context window of a single LLM call. The LLM receives the complete, noise-free timeline of one user at a time, ensuring it has 100% of the relevant past context necessary to spot delayed effects (like a 6-week hair fall lag) without exceeding token limits or losing information via embedding chunks.
 
 ### Reasoning Trace
-The reasoning trace is made visible directly in the output (`results.json` and the Streamlit UI). I enforce this by having the LLM generate a `reason` field before finalizing confidence, compelling it to explicitly cite the `[Session IDs]` and `[Dates]`, evaluate the exact time gap, and rule out contradictions. This prevents the LLM from making leaps of logic and allows me to see exactly which events the system considered when forming a conclusion.
+The reasoning trace is made visible directly in the output (`data/results.json` and the Streamlit UI). I enforce this by having the LLM generate a `reason` field before finalizing confidence, compelling it to explicitly cite the `[Session IDs]` and `[Dates]`, evaluate the exact time gap, and rule out contradictions. This prevents the LLM from making leaps of logic and allows me to see exactly which events the system considered when forming a conclusion.
 
 ## Running the Application
 
@@ -68,6 +67,6 @@ To launch the interactive dashboard, run:
 ```bash
 python main.py ui
 # Or alternatively:
-streamlit run ui/app.py
+streamlit run ui.py
 ```
 This will open a browser window where you can upload the dataset or analyze the default one automatically, viewing formatted patterns per user.

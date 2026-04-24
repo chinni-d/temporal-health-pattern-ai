@@ -2,13 +2,6 @@ import streamlit as st
 import json
 import os
 import time
-import sys
-from pathlib import Path
-
-# Add the project root to sys.path
-root_path = str(Path(__file__).parent.parent)
-if root_path not in sys.path:
-    sys.path.insert(0, root_path)
 
 from src.processing.data_loader import load_dataset, get_users
 from src.engine.timeline_builder import build_timeline

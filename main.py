@@ -7,7 +7,7 @@ from src.engine.pattern_engine import analyze_all_users
 
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == "ui":
-        os.system("streamlit run ui/app.py")
+        os.system("streamlit run ui.py")
         return
         
     dataset_path = "data/askfirst_synthetic_dataset.json"

@@ -1,15 +1,15 @@
 # AI Intern Assignment Writeup
 
 ## 1. Approach to the Reasoning Problem
-The core challenge was to construct a robust reasoning layer capable of detecting temporal connections across messy, unstructured, cross-conversational data without hallucinating or merely acting as a keyword retriever. Our approach was split into a deterministic preprocessing layer and an LLM-based pattern engine:
-1. **Deterministic Timeline Construction (`timeline_builder.py`)**: Before querying the LLM, we sorted conversations temporally and abstracted them down to essential events linked to exact dates and Session IDs. This stripped away conversational noise while keeping the causal sequence perfectly intact.
-2. **Constrained Prompting (`pattern_engine.py`)**: We utilized `openai/gpt-4o-mini` (via OpenRouter) as the reasoning engine. The system prompt enforces strict rules: 
+The core challenge was to construct a robust reasoning layer capable of detecting temporal connections across messy, unstructured, cross-conversational data without hallucinating or merely acting as a keyword retriever. My approach was split into a deterministic preprocessing layer and an LLM-based pattern engine:
+1. **Deterministic Timeline Construction (`timeline_builder.py`)**: Before querying the LLM, I sorted conversations temporally and abstracted them down to essential events linked to exact dates and Session IDs. This stripped away conversational noise while keeping the causal sequence perfectly intact.
+2. **Constrained Prompting (`pattern_engine.py`)**: I utilized `openai/gpt-4o-mini` (via OpenRouter) as the reasoning engine. The system prompt enforces strict rules: 
    - Patterns must *strictly* flow from Cause to Effect.
    - Exact timestamps and Session IDs must be cited to prove non-coincidence and justify confidence.
    - External medical jargon (e.g., cortisol, melatonin) is strictly banned to ensure all conclusions are drawn *solely* from the provided data.
    - The LLM is directed to actively scan for delayed patterns (e.g., a 6-week lag between calorie restriction and hair fall), dose-response relationships (small vs. large dairy intake), and cascading chains (screens -> sleep deprivation -> anxiety).
 
-By anchoring the LLM prompt to explicit temporal definitions (immediate vs delayed) and strict evidence citation (Session IDs), we shifted the LLM from loosely associating keywords to executing logical, timeline-bound pattern recognition.
+By anchoring the LLM prompt to explicit temporal definitions (immediate vs delayed) and strict evidence citation (Session IDs), I shifted the LLM from loosely associating keywords to executing logical, timeline-bound pattern recognition.
 
 ## 2. Failures, Hallucinations, and Future Improvements
 ### Where the System Fails or Confidently Hallucinates

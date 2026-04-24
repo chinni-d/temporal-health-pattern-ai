@@ -4,7 +4,7 @@ import os
 import time
 from data_loader import load_dataset, get_users
 from timeline_builder import build_timeline
-from pattern_engine import detect_patterns
+from pattern_engine import detect_patterns, identify_intent, general_chat
 
 # 1. Page Configuration & Setup
 st.set_page_config(page_title="Clary - Health Pattern AI", page_icon="🤖", layout="centered")
@@ -75,8 +75,7 @@ if prompt := st.chat_input("Ask me to analyze your health patterns"):
 
     # AI Process & Response
     with st.chat_message("assistant", avatar="🤖"):
-        # Process intent in background (no visible status box)
-        from pattern_engine import identify_intent, general_chat, detect_patterns
+        # Process intent
         intent = identify_intent(prompt)
         
         # If intent is CHAT, use general chat

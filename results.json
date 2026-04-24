@@ -1,0 +1,104 @@
+{
+  "results": [
+    {
+      "user_id": "USR001",
+      "patterns": [
+        {
+          "pattern": "late eating -> stomach, acidity",
+          "confidence": "high",
+          "reason": "Observed in 4 sessions ([S01, S04, S07, S09], Jan 5, Jan 28, Feb 23, Mar 19). Late eating consistently correlates with occurrences of stomach issues and acidity, showing effects on the same day."
+        },
+        {
+          "pattern": "dehydration -> headache",
+          "confidence": "high",
+          "reason": "Observed in 3 sessions ([S02, S06, S08], Jan 12, Feb 14, Mar 8). Each time dehydration was reported, headaches occurred as an immediate effect on the same day."
+        },
+        {
+          "pattern": "sedentary -> back pain",
+          "confidence": "medium",
+          "reason": "Observed in 1 session ([S03], Jan 19). Sedentary behavior led to back pain, but due to only one observation, confidence is medium."
+        },
+        {
+          "pattern": "stress -> fatigue, sleep",
+          "confidence": "medium",
+          "reason": "Observed in 1 session ([S04], Jan 28). Stress was reported on the same day as fatigue and sleep disturbances, suggesting a potential cause-effect relationship, although it needs more repetition to be high confidence."
+        },
+        {
+          "pattern": "caffeine -> dehydration",
+          "confidence": "medium",
+          "reason": "Observed in 1 session ([S06], Feb 14). Caffeine was mentioned alongside dehydration, indicating a potential link, but further evidence is needed to confirm a strong pattern."
+        }
+      ]
+    },
+    {
+      "user_id": "USR002",
+      "patterns": [
+        {
+          "pattern": "calorie restriction -> dizziness",
+          "confidence": "high",
+          "reason": "Observed in 1 session (S01, Jan 8). Dizziness occurred immediately after starting the diet and intermittent fasting, indicating a direct correlation."
+        },
+        {
+          "pattern": "dairy increase -> acne on jawline",
+          "confidence": "high",
+          "reason": "Observed in 2 sessions (S02, Jan 15 and S03, Jan 22). Acne on the jawline appeared after increasing dairy consumption in the week prior to Jan 22, showing a consistent response pattern."
+        },
+        {
+          "pattern": "dairy reduction -> improvement in skin",
+          "confidence": "high",
+          "reason": "Observed in 2 sessions (S03, Jan 22 and S04, Feb 1). Improvement in skin was noted one week after reducing dairy consumption, confirming a cause-effect relationship."
+        },
+        {
+          "pattern": "calorie restriction -> fatigue and brain fog",
+          "confidence": "high",
+          "reason": "Observed in 1 session (S05, Feb 10). Fatigue and brain fog appeared abruptly after prolonged calorie restriction, indicating immediate effects of the caloric deficit."
+        },
+        {
+          "pattern": "calorie restriction -> hair fall (telogen effluvium)",
+          "confidence": "high",
+          "reason": "Observed in 2 sessions (S05, Feb 10 and S06, Feb 19). Hair fall was reported in conjunction with calorie restriction over several weeks, demonstrating a cascading effect as the body responded to nutritional deficiency."
+        },
+        {
+          "pattern": "dairy reintroduction -> acne monitoring and future patterns",
+          "confidence": "medium",
+          "reason": "Observed in 2 sessions (S07, Feb 27 and S08, Mar 7). Acne monitoring was initiated after reintroducing dairy, indicating a potential delayed effect that could be confirmed with further observations."
+        },
+        {
+          "pattern": "improvement in nutrition -> recovery of hair fall and skin condition",
+          "confidence": "medium",
+          "reason": "Observed in 2 sessions (S08, Mar 7 and S09, Mar 18). Recovery from hair fall and skin improvement were noted after improvements in nutrition took place over several weeks, suggesting a delayed response to dietary changes."
+        }
+      ]
+    },
+    {
+      "user_id": "USR003",
+      "patterns": [
+        {
+          "pattern": "high carb lunch -> fatigue",
+          "confidence": "high",
+          "reason": "Observed in 3 sessions ([Session IDs S01, S03, S06], Dates: Jan 6, Jan 23, Feb 20). High carb lunch leads to fatigue on the same day, confirming a direct cause-and-effect relationship."
+        },
+        {
+          "pattern": "stress from product launch -> period cramps",
+          "confidence": "medium",
+          "reason": "Observed in 2 sessions ([Session IDs S02, S05], Dates: Jan 14, Feb 11). Stress during the product launch correlates with period cramps within a month. The effect occurs on the same day as the cause."
+        },
+        {
+          "pattern": "late night screen use -> sleep deprivation",
+          "confidence": "high",
+          "reason": "Observed in 3 sessions ([Session IDs S04, S07, S08], Dates: Feb 3, Feb 28, Mar 10). Late night screen use leads to sleep deprivation, confirmed on the same day across multiple sessions."
+        },
+        {
+          "pattern": "sleep deprivation -> anxiety",
+          "confidence": "high",
+          "reason": "Observed in 2 sessions ([Session IDs S07, S09], Dates: Feb 28, Mar 16). Sleep deprivation leads to anxiety reported within a week in multiple sessions. The effect occurs shortly after the cause."
+        },
+        {
+          "pattern": "period -> stress -> sleep deprivation",
+          "confidence": "medium",
+          "reason": "Observed in 2 sessions ([Session IDs S02, S05], Dates: Jan 14, Feb 11). The period causes stress, which leads to sleep deprivation a few weeks later, creating a cascading effect."
+        }
+      ]
+    }
+  ]
+}

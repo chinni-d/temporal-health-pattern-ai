@@ -9,15 +9,18 @@ load_dotenv()
 
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-try:
-    OPENROUTER_API_KEY = st.secrets["OPENROUTER_API_KEY"]
-except Exception:
-    OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
+def get_api_key():
+    try:
+        return st.secrets["OPENROUTER_API_KEY"]
+    except Exception:
+        return os.environ.get("OPENROUTER_API_KEY", "")
 
 def detect_patterns(user_id: str, timeline: list) -> dict:
     """
     Use LLM to infer causal relationships and output JSON.
     """
+    api_key = get_api_key()
+    
     prompt = f"""Analyze the timeline and detect patterns.
 
 STRICT RULES:
@@ -57,7 +60,7 @@ Timeline:
         response = requests.post(
             OPENROUTER_URL,
             headers={
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json"
             },
             json={

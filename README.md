@@ -3,14 +3,30 @@
 This system analyzes multi-user conversational health data to detect hidden causal patterns over time. 
 It identifies relationships between habits and symptoms using temporal reasoning and outputs structured explanations with confidence scores.
 
-## Architecture
+## Folder Architecture
 
-* `data_loader.py`: Loads the JSON dataset.
-* `preprocessor.py`: Sorts conversations and extracts relevant tags as events.
-* `timeline_builder.py`: Converts conversations into a sequence of events.
-* `pattern_engine.py`: Analyzes the sequence using an LLM (OpenRouter `gpt-4o-mini`) and outputs structured reasoning.
-* `ui.py`: A premium **Chat-Streaming Companion** interface (Clary) that allows for conversational analysis, individual user data insertion (via file upload or manual paste), and streamed reasoning results.
-* `main.py`: Entry point for CLI processing or launching the UI.
+```text
+temporal-health-pattern-ai/
+├── data/                       # Datasets & Results
+│   ├── askfirst_synthetic_dataset.json
+│   └── results.json
+├── src/                        # Core Logic Package
+│   ├── __init__.py
+│   ├── engine/                 # AI Detection Engines
+│   │   ├── __init__.py
+│   │   ├── pattern_engine.py
+│   │   └── timeline_builder.py
+│   ├── processing/             # Data Preprocessing
+│   │   ├── __init__.py
+│   │   ├── data_loader.py
+│   │   └── preprocessor.py
+│   └── utils.py                # Utilities
+├── ui/                         # User Interface
+│   └── app.py                  # Streamlit App
+├── main.py                     # Entry Point
+├── .env                        # Private config
+└── .gitignore
+```
 
 ## Requirements
 
@@ -40,7 +56,7 @@ The reasoning trace is made visible directly in the output (`results.json` and t
 ## Running the Application
 
 ### Command-Line Interface (CLI)
-You can run the analysis directly from the terminal. The script will look for `askfirst_synthetic_dataset.json` in the current directory or the `Downloads` folder, process all users, and save the results to `results.json`.
+You can run the analysis directly from the terminal. The script will look for `data/askfirst_synthetic_dataset.json` in the current directory or the `Downloads` folder, process all users, and save the results to `data/results.json`.
 
 ```bash
 python main.py
@@ -52,6 +68,6 @@ To launch the interactive dashboard, run:
 ```bash
 python main.py ui
 # Or alternatively:
-streamlit run ui.py
+streamlit run ui/app.py
 ```
 This will open a browser window where you can upload the dataset or analyze the default one automatically, viewing formatted patterns per user.

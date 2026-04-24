@@ -1,5 +1,5 @@
 from datetime import datetime
-from preprocessor import sort_conversations, extract_events
+from src.processing.preprocessor import sort_conversations, extract_events
 
 def build_timeline(user_data: dict) -> list:
     """

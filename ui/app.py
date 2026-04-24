@@ -2,9 +2,17 @@ import streamlit as st
 import json
 import os
 import time
-from data_loader import load_dataset, get_users
-from timeline_builder import build_timeline
-from pattern_engine import detect_patterns, identify_intent, general_chat
+import sys
+from pathlib import Path
+
+# Add the project root to sys.path
+root_path = str(Path(__file__).parent.parent)
+if root_path not in sys.path:
+    sys.path.insert(0, root_path)
+
+from src.processing.data_loader import load_dataset, get_users
+from src.engine.timeline_builder import build_timeline
+from src.engine.pattern_engine import detect_patterns, identify_intent, general_chat
 
 # 1. Page Configuration & Setup
 st.set_page_config(page_title="Clary - Health Pattern AI", page_icon="🤖", layout="centered")
@@ -27,7 +35,7 @@ with st.sidebar:
     uploaded_file = st.file_uploader("📂 Upload Health Dataset (JSON)", type=["json"])
     
     # Fallback/Default path
-    default_path = "askfirst_synthetic_dataset.json"
+    default_path = "data/askfirst_synthetic_dataset.json"
     dataset = None
     
     if uploaded_file is not None:

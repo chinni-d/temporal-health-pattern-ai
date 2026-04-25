@@ -126,11 +126,44 @@ def identify_intent(prompt: str) -> str:
     except Exception:
         return "CHAT"
 
-def general_chat(messages: list) -> str:
+def general_chat(messages: list, user_data: dict = None) -> str:
     """
     Handle general conversational messages contextually.
     """
     api_key = get_api_key()
+    
+    user_context = ""
+    if user_data:
+        name = user_data.get('name', 'User')
+        age = user_data.get('age', 'N/A')
+        gender = user_data.get('gender', 'N/A')
+        location = user_data.get('location', 'N/A')
+        occupation = user_data.get('occupation', 'N/A')
+        notes = user_data.get('onboarding_notes', '')
+        
+        # Include full conversation history for detailed queries
+        full_history = []
+        for conv in user_data.get('conversations', []):
+            session_id = conv.get('session_id')
+            user_msg = conv.get('user_message')
+            followup = conv.get('user_followup', '')
+            response = conv.get('clary_response', '')
+            tags = ", ".join(conv.get('tags', []))
+            
+            session_text = f"Session {session_id} ({conv.get('timestamp')[:10]}):\n"
+            session_text += f"- User: {user_msg}\n"
+            if followup: session_text += f"- Follow-up: {followup}\n"
+            session_text += f"- Clary: {response}\n"
+            session_text += f"- Tags: {tags}\n"
+            full_history.append(session_text)
+        
+        history_str = "\n".join(full_history)
+        user_context = (
+            f"You are talking to {name}. Profile: Age {age}, Gender {gender}, Location {location}, Occupation {occupation}. "
+            f"Onboarding notes: {notes}. "
+            f"Full Health History:\n{history_str}"
+        )
+
     try:
         response = requests.post(
             OPENROUTER_URL,
@@ -141,8 +174,18 @@ def general_chat(messages: list) -> str:
             json={
                 "model": "openai/gpt-4o-mini",
                 "messages": [
-                    {"role": "system", "content": "You are Clary, a Health Pattern AI companion. You help users understand causal links in their health history. Be concise, empathetic, and professional. If the user says 'ok' or similar acknowledgments, respond naturally based on the conversation history."}
-                ] + messages[-5:] # send last 5 messages for context
+                    {
+                        "role": "system", 
+                        "content": f"You are Clary, a Health Pattern AI companion. {user_context} "
+                                   "You help users understand causal links in their health history. "
+                                   "If the user says 'Hi' or greets you, reply with 'Hi {name}' (replacing {name} with their actual name if known). "
+                                   "Be concise, empathetic, and professional. You MUST be highly contextual: use the provided user profile, "
+                                   "full health history, and current chat history to provide accurate and relevant answers. "
+                                   "If the user asks to summarize a specific session (e.g., 'summarize session USR001_S07'), "
+                                   "use the 'Full Health History' provided in the context to give a detailed summary of that specific session. "
+                                   "If they ask about their general data or patterns, connect the dots across their entire history."
+                    }
+                ] + messages[-10:] # send last 10 messages for context
             },
             timeout=30
         )

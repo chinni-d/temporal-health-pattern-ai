@@ -81,9 +81,14 @@ if prompt := st.chat_input("Ask me to analyze your health patterns"):
         
         # If intent is CHAT, use general chat
         if intent == "CHAT":
-            with st.spinner("💭 ..."):
+            with st.spinner("Processing..."):
                 chat_context = st.session_state.messages
-                response = general_chat(chat_context)
+                # Find user data if a user_id is selected
+                user_data = None
+                if selected_user_id and 'users' in locals():
+                    user_data = next((u for u in users if u["user_id"] == selected_user_id), None)
+                
+                response = general_chat(chat_context, user_data=user_data)
             
             full_response = st.write_stream(stream_response(response))
             st.session_state.messages.append({"role": "assistant", "content": full_response})

@@ -126,7 +126,7 @@ def identify_intent(prompt: str) -> str:
     except Exception:
         return "CHAT"
 
-def general_chat(messages: list, user_data: dict = None) -> str:
+def handle_general_chat(messages: list, user_data: dict = None) -> str:
     """
     Handle general conversational messages contextually.
     """

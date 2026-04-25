@@ -5,7 +5,7 @@ import time
 
 from src.processing.data_loader import load_dataset, get_users
 from src.engine.timeline_builder import build_timeline
-from src.engine.pattern_engine import detect_patterns, identify_intent, general_chat
+from src.engine.pattern_engine import detect_patterns, identify_intent, handle_general_chat
 
 # 1. Page Configuration & Setup
 st.set_page_config(page_title="Clary - Health Pattern AI", page_icon="🤖", layout="centered")
@@ -104,7 +104,7 @@ if prompt := st.chat_input("Ask me to analyze your health patterns"):
                 if selected_user_id and 'users' in locals():
                     user_data = next((u for u in users if u["user_id"] == selected_user_id), None)
                 
-                response = general_chat(chat_context, user_data=user_data)
+                response = handle_general_chat(chat_context, user_data=user_data)
             
             full_response = st.write_stream(stream_response(response))
             st.session_state.messages.append({"role": "assistant", "content": full_response})

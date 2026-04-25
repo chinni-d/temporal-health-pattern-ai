@@ -10,13 +10,29 @@ from src.engine.pattern_engine import detect_patterns, identify_intent, general_
 # 1. Page Configuration & Setup
 st.set_page_config(page_title="Clary - Health Pattern AI", page_icon="🤖", layout="centered")
 
-# Custom Dark Mode Styling
+# Custom Styling for Theme Awareness
 st.markdown("""
     <style>
-    .stApp { background-color: #0E1117; color: #FFFFFF; }
-    .stChatMessage { background-color: #1E2127; border-radius: 10px; margin-bottom: 10px; }
+    /* Use theme-aware colors or transparent backgrounds for chat messages */
+    .stChatMessage { 
+        border-radius: 10px; 
+        margin-bottom: 10px; 
+        border: 1px solid rgba(128, 128, 128, 0.2);
+    }
     .stChatInputContainer { padding-bottom: 20px; }
-    hr { margin: 1rem 0; border: 0; border-top: 1px solid #444; }
+    
+    /* Make code blocks and other elements look good in both modes */
+    code {
+        color: #ff4b4b !important;
+    }
+    
+    /* Responsive styling for better readability */
+    @media (prefers-color-scheme: dark) {
+        .stChatMessage { background-color: rgba(255, 255, 255, 0.05); }
+    }
+    @media (prefers-color-scheme: light) {
+        .stChatMessage { background-color: rgba(0, 0, 0, 0.03); }
+    }
     </style>
 """, unsafe_allow_html=True)
 
